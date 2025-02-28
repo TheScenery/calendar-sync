@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Calendar Sync Application
 
-## Getting Started
+This application allows users to sync their Outlook calendar with Google calendar.
 
-First, run the development server:
+## Setup
 
+1. Clone the repository
+```bash
+git clone <repository-url>
+cd calendar-sync
+```
+
+2. Install dependencies
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Configure environment variables
+Create a `.env.local` file in the root directory with the following variables:
+```env
+NEXT_PUBLIC_AZURE_CLIENT_ID=your_client_id
+NEXT_PUBLIC_REDIRECT_URI=http://localhost:3000/api/auth/callback/outlook
+AZURE_CLIENT_SECRET=your_client_secret
+```
+
+4. Run the development server
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Production Deployment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Update Azure AD Application settings:
+   - Add your production domain to the list of allowed redirect URIs
+   - Configure appropriate security settings
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Set environment variables in your production environment:
+```env
+NEXT_PUBLIC_AZURE_CLIENT_ID=your_client_id
+NEXT_PUBLIC_REDIRECT_URI=https://your-domain.com/api/auth/callback/outlook
+AZURE_CLIENT_SECRET=your_client_secret
+NODE_ENV=production
+```
 
-## Learn More
+## Security Notes
 
-To learn more about Next.js, take a look at the following resources:
+- Never commit `.env.local` or any files containing sensitive information
+- Always use HTTPS in production
+- Keep your client secret secure
+- Regularly rotate credentials
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- OAuth2 authentication with Microsoft Azure AD
+- Secure token handling
+- Modern UI with Tailwind CSS
+- TypeScript support
 
-## Deploy on Vercel
+## License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
