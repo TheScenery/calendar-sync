@@ -7,6 +7,7 @@ export default function Home() {
   const loginUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${AZURE_CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}&response_mode=query&scope=offline_access%20user.read%20calendars.read%20calendars.read.shared`;
 
   const handleLogin = () => {
+    console.log('Login URL:', loginUrl);
     window.location.href = loginUrl;
   };
 

@@ -2,10 +2,9 @@ import { NextResponse } from 'next/server';
 
 // 获取当前环境的重定向URI
 const getRedirectUri = () => {
-  if (process.env.NODE_ENV === 'production') {
-    return process.env.NEXT_PUBLIC_REDIRECT_URI_PRODUCTION;
-  }
-  return process.env.NEXT_PUBLIC_REDIRECT_URI_DEVELOPMENT;
+  const uri = process.env.NEXT_PUBLIC_REDIRECT_URI;
+  console.log('Using redirect URI:', uri); // 添加日志以便调试
+  return uri;
 };
 
 export async function GET(request: Request) {
@@ -41,7 +40,7 @@ export async function GET(request: Request) {
       const error = await tokenResponse.text();
       console.error('Token exchange failed:', error);
       return NextResponse.json(
-        { error: 'Failed to exchange authorization code' },
+        { error: 'Failed to exchange authorization code', details: error },
         { status: 500 }
       );
     }
