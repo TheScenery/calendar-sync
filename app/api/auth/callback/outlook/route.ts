@@ -1,3 +1,4 @@
+import { storeTokens } from '@/app/utils/token';
 import { NextResponse } from 'next/server';
 
 // 获取当前环境的重定向URI
@@ -46,6 +47,7 @@ export async function GET(request: Request) {
     }
 
     const tokens = await tokenResponse.json();
+    storeTokens(tokens.access_token, tokens.refresh_token);
 
     // 构建令牌页面URL时使用请求的origin
     const origin = new URL(request.url).origin;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 
 function TokenDisplay() {
@@ -10,6 +10,12 @@ function TokenDisplay() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
+  };
+
+  const router = useRouter();
+
+  const navigateToCalendar = () => {
+    router.push('/calendar');
   };
 
   return (
@@ -47,6 +53,8 @@ function TokenDisplay() {
           </div>
         </div>
       </div>
+
+      <button onClick={navigateToCalendar} className="mt-6 px-4 py-2 bg-blue-500 text-white rounded">Go to Calendar</button>
     </div>
   );
 }
