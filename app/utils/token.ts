@@ -1,3 +1,5 @@
+import { createClient } from 'redis';
+
 // Define a type for token providers
 export type TokenProvider = 'outlook' | 'google';
 
@@ -13,17 +15,22 @@ const tokens: Record<TokenProvider, { accessToken: string; refreshToken: string 
   },
 };
 
-export const getAccessToken = (provider: TokenProvider = 'outlook') => {
-  return tokens[provider].accessToken;
+const redis = await createClient({
+  url: process.env.REDIS_URL,
+}).connect();
+
+export const getAccessToken = async (provider: TokenProvider = 'outlook') => {
+  const tokens = await redis.get(provider);
+  return tokens ? JSON.parse(tokens).accessToken : null;  
 };
 
-export const getRefreshToken = (provider: TokenProvider = 'outlook') => {
-  return tokens[provider].refreshToken;
+export const getRefreshToken = async (provider: TokenProvider = 'outlook') => {
+  const tokens = await redis.get(provider);
+  return tokens ? JSON.parse(tokens).refreshToken : null;
 };
 
-export const storeTokens = (accessToken: string, refreshToken: string, provider: TokenProvider = 'outlook') => {
-  tokens[provider].accessToken = accessToken;
-  tokens[provider].refreshToken = refreshToken;
+export const storeTokens = async (accessToken: string, refreshToken: string, provider: TokenProvider = 'outlook') => {
+  await redis.set(provider, JSON.stringify({ accessToken, refreshToken }));
 };
 
 // Get all available providers that have tokens

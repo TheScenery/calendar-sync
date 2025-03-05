@@ -2,7 +2,7 @@ import { getAccessToken } from "@/app/utils/token";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const accessToken = getAccessToken();
+  const accessToken = await getAccessToken();
 
   if (!accessToken) {
     return NextResponse.json({ error: 'Access token is required' }, { status: 400 });
