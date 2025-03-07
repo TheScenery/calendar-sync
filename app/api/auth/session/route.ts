@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { verifyJWT } from '@/app/utils/jwt';
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -10,7 +11,12 @@ export async function GET() {
   }
 
   try {
-    const session = JSON.parse(sessionCookie.value);
+    // 验证并解码JWT令牌
+    const session = verifyJWT(sessionCookie.value);
+    
+    if (!session) {
+      return NextResponse.json({ user: null });
+    }
     
     // 检查会话是否过期
     if (session.expiresAt && session.expiresAt < Date.now()) {

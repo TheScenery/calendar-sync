@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { signJWT } from '@/app/utils/jwt';
 
 export async function GET(request: Request) {
   try {
@@ -72,15 +73,19 @@ export async function GET(request: Request) {
       expiresAt: Date.now() + tokens.expires_in * 1000,
     };
 
+    // 使用JWT加密会话数据
+    const jwtToken = signJWT(session);
+
     // 设置会话cookie
     const cookieStore = await cookies();
     cookieStore.set({
       name: 'session',
-      value: JSON.stringify(session),
+      value: jwtToken,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24 * 7, // 7天
       path: '/',
+      sameSite: 'lax',
     });
 
     // 重定向到首页
