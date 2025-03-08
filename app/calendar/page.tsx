@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import ProtectedRoute from '../components/ProtectedRoute';
+import { useRouter } from 'next/navigation';
 
 type Event = {
   id: number;
@@ -11,9 +12,11 @@ type Event = {
 };
 
 const CalendarPage: React.FC = () => {
+  const router = useRouter();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
   useEffect(() => {
     setLoading(true);
     fetch("/api/calendar/outlook")
@@ -22,6 +25,11 @@ const CalendarPage: React.FC = () => {
       .catch((error) => setError(error))
       .finally(() => setLoading(false));
   }, []);
+  
+  const navigateToSync = () => {
+    router.push('/calendar/sync');
+  };
+  
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -29,12 +37,18 @@ const CalendarPage: React.FC = () => {
     return <div>Error: {error}</div>;
   }
 
-  console.log(events);
-
   return (
     <ProtectedRoute>
       <div className="min-h-screen p-8 bg-gray-50 text-black">
-        <h1 className="text-3xl font-bold mb-8 text-center text-black">Calendar Information</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-center text-black">Calendar Information</h1>
+          <button
+            onClick={navigateToSync}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Sync Calendars
+          </button>
+        </div>
         <div className="bg-white shadow-md rounded-lg p-6">
           {events.length > 0 ? (
             <ul className="space-y-4">
