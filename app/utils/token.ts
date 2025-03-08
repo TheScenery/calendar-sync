@@ -41,13 +41,14 @@ export const storeTokens = async (
   userId: string,
   accessToken: string,
   refreshToken: string,
-  provider: TokenProvider = 'outlook'
+  provider: TokenProvider = 'outlook',
+  expiresIn: number = 3600
 ): Promise<boolean> => {
   try {
     const tokenData: TokenData = {
       accessToken,
       refreshToken,
-      expiresAt: Date.now() + 3600 * 1000 // 默认1小时过期
+      expiresAt: Date.now() + expiresIn * 1000
     };
     
     return await updateUserTokens(userId, provider, tokenData);
@@ -57,10 +58,26 @@ export const storeTokens = async (
   }
 };
 
-// Get all available providers that have tokens
-export const getAvailableProviders = () => {
-  return Object.entries(tokens)
-    .filter(([_, value]) => value.accessToken)
-    .map(([key]) => key as TokenProvider);
+// 获取所有可用的提供商
+export const getAvailableProviders = async (userId: string): Promise<TokenProvider[]> => {
+  try {
+    const providers: TokenProvider[] = [];
+    
+    // 检查每个提供商是否有有效的令牌
+    const outlookTokens = await getUserTokens(userId, 'outlook');
+    if (outlookTokens) {
+      providers.push('outlook');
+    }
+    
+    const googleTokens = await getUserTokens(userId, 'google');
+    if (googleTokens) {
+      providers.push('google');
+    }
+    
+    return providers;
+  } catch (error) {
+    console.error(`Error getting available providers for user ${userId}:`, error);
+    return [];
+  }
 };
 

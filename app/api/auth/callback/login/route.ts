@@ -90,6 +90,9 @@ export async function GET(request: Request) {
           }
         }
       };
+      
+      // 保存用户信息
+      await saveUser(user);
     } else {
       // 更新现有用户的Google令牌
       if (!user.tokens) {
@@ -101,10 +104,10 @@ export async function GET(request: Request) {
         refreshToken: tokens.refresh_token,
         expiresAt: Date.now() + tokens.expires_in * 1000,
       };
+      
+      // 保存更新后的用户信息
+      await saveUser(user);
     }
-    
-    // 保存用户信息
-    await saveUser(user);
     
     // 创建会话
     const session = {
