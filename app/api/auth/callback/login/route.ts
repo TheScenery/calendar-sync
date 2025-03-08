@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { signJWT } from '@/app/utils/jwt';
+import { userExists, saveUser, getUserByEmail } from '@/app/services/userService';
+import { UserWithTokens } from '@/app/models/User';
 
 export async function GET(request: Request) {
   try {
@@ -60,13 +62,57 @@ export async function GET(request: Request) {
 
     const userInfo = await userInfoResponse.json();
     
+    // 检查用户是否存在于系统中
+    const userExistsInSystem = await userExists(userInfo.email);
+    
+    if (!userExistsInSystem) {
+      // 如果用户不存在，返回错误
+      return NextResponse.redirect(new URL('/login?error=user_not_found', request.url));
+    }
+    
+    // 获取现有用户或创建新用户
+    let user = await getUserByEmail(userInfo.email);
+    
+    if (!user) {
+      // 创建新用户
+      user = {
+        id: userInfo.id,
+        email: userInfo.email,
+        name: userInfo.name,
+        picture: userInfo.picture,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        tokens: {
+          google: {
+            accessToken: tokens.access_token,
+            refreshToken: tokens.refresh_token,
+            expiresAt: Date.now() + tokens.expires_in * 1000,
+          }
+        }
+      };
+    } else {
+      // 更新现有用户的Google令牌
+      if (!user.tokens) {
+        user.tokens = {};
+      }
+      
+      user.tokens.google = {
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token,
+        expiresAt: Date.now() + tokens.expires_in * 1000,
+      };
+    }
+    
+    // 保存用户信息
+    await saveUser(user);
+    
     // 创建会话
     const session = {
       user: {
-        id: userInfo.id,
-        name: userInfo.name,
-        email: userInfo.email,
-        picture: userInfo.picture,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        picture: user.picture,
       },
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,

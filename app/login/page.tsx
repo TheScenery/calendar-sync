@@ -1,18 +1,26 @@
 'use client';
 
 import { useAuth } from '../context/AuthContext';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
   const { login, isAuthenticated, loading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated && !loading) {
       router.push('/');
     }
-  }, [isAuthenticated, loading, router]);
+
+    // 检查URL中是否有错误参数
+    const errorParam = searchParams.get('error');
+    if (errorParam === 'user_not_found') {
+      setError('您的账号未被授权使用此应用。请联系管理员添加您的邮箱到允许列表。');
+    }
+  }, [isAuthenticated, loading, router, searchParams]);
 
   if (loading) {
     return (
@@ -29,6 +37,12 @@ export default function LoginPage() {
         <p className="text-gray-600 mb-8 text-center">
           请使用 Google 账号登录以访问您的日历信息
         </p>
+        
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-md border border-red-200">
+            {error}
+          </div>
+        )}
         
         <button
           onClick={login}
