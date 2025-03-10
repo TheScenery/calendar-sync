@@ -6,9 +6,9 @@ import { useRouter } from 'next/navigation';
 
 type Event = {
   id: number;
-  subject: string;
-  start: { dateTime: string };
-  end: { dateTime: string };
+  title: string;
+  start: string;
+  end: string;
 };
 
 const CalendarPage: React.FC = () => {
@@ -19,9 +19,9 @@ const CalendarPage: React.FC = () => {
   
   useEffect(() => {
     setLoading(true);
-    fetch("/api/calendar/outlook")
+    fetch("/api/calendar")
       .then((response) => response.json())
-      .then((data) => setEvents(data))
+      .then((data) => setEvents(data.events))
       .catch((error) => setError(error))
       .finally(() => setLoading(false));
   }, []);
@@ -54,9 +54,9 @@ const CalendarPage: React.FC = () => {
             <ul className="space-y-4">
               {events.map(event => (
                 <li key={event.id} className="p-4 bg-gray-100 rounded-lg shadow-sm">
-                  <h2 className="text-xl font-semibold text-black">{event.subject}</h2>
-                  <p className="text-gray-600">{event.start.dateTime}</p>
-                  <p className="text-gray-600">{event.end.dateTime}</p>
+                  <h2 className="text-xl font-semibold text-black">{event.title}</h2>
+                  <p className="text-gray-600">{event.start}</p>
+                  <p className="text-gray-600">{event.end}</p>
                 </li>
               ))}
             </ul>
